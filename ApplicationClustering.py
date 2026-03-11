@@ -751,7 +751,7 @@ def main():
     
     # Setup results folders + basic seed
     base_dir = _base_dir()
-    results_dir = os.path.join(base_dir, "Results_Clustering2")
+    results_dir = os.path.join(base_dir, "Results_Clustering")
     os.makedirs(results_dir, exist_ok=True)
     stamp = time.strftime("%Y%m%d_%H%M%S")
 
