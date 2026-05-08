@@ -9,19 +9,16 @@ Created on Sat Jan 10 18:13:49 2026
 import numpy as np
 
 class MPCKMeans:
-    def __init__(self, K, w = 1.0, max_iter = 150, random_state = None,
-                 eps0 = 1e-9, tol = 1e-6, reg_max_tries = 6,
-                 reg_growth = 10.0):
+    def __init__(self, K, w = 1.0, max_iter = 150, random_state = None, eps0 = 1e-9, tol = 1e-6, 
+                 reg_max_tries = 6, reg_growth = 10.0):
         self.K = K               # number of clusters
         self.w = w               # weight of pairwise constraints
         self.max_iter = max_iter # maximum number of iters
         self.eps0 = eps0         # initial regularization parameter 
         self.tol = tol           # convergence tolerance
-        self.reg_max_tries = reg_max_tries 
-        # reg_max_tries = max attempts if matrix not SPD 
+        self.reg_max_tries = reg_max_tries  # max attempts if matrix not SPD 
         self.reg_growth = reg_growth # multiplicative factor 
-        self.rng = np.random.default_rng(random_state) 
-        # RNG for reproducibility
+        self.rng = np.random.default_rng(random_state) # RNG for reproducibility
            
     def fit(self, X, must_link = (), cannot_link = ()):      
         """
@@ -30,24 +27,20 @@ class MPCKMeans:
     
         :arg(X, must_link, cannot_link):
             X = data matrix of shape (P, N)
-            must_link = index pairs (i, j) that should be in the 
-                        same cluster
-            cannot_link = index pairs (i, j) that should be in 
-                          different clusters
+            must_link = index pairs (i, j) that should be in the same cluster
+            cannot_link = index pairs (i, j) that should be in different clusters
          
         :return:
             labels = array of cluster assignments for each data point 
             mu = matrix of final cluster centroids 
             M = learned cluster-specific inverse metric matrices A_k^{-1}
-            neighborhoods = list of connected components induced 
-                            by Must-Link constraints
+            neighborhoods = list of connected components induced by Must-Link constraints
         """
         X = np.asarray(X, dtype = float)
         P, N = X.shape
 
         # Preprocess constraints: neighborhoods + ML/CL propagation
-        ml_graph, cl_graph, neighborhoods = self._preprocess_constraints(
-            P, list(must_link), list(cannot_link))
+        ml_graph, cl_graph, neighborhoods = self._preprocess_constraints(P, list(must_link), list(cannot_link))
 
         # Initialize centroids using neighborhoods
         mu = self._initialize_cluster_centers(X, neighborhoods)
@@ -62,35 +55,24 @@ class MPCKMeans:
             # save old centroids for convergence checking
             mu_prev = mu.copy() 
 
-            # Ensure SPD matrices and compute Cholesky factors L_k
-            # such that M_k = L_k L_k^T
+            # Ensure SPD matrices and compute Cholesky factors L_k such that M_k = L_k L_k^T
             # used for Mahalanobis distances and log-determinant terms
             cholesky_factors, logdet_M = self._factorize_metrics(M)
 
             # Compute farthest intra-cluster pairs (for CL term)
-            farthest = self._find_farthest_pairs(
-                X, labels, cholesky_factors
-                )
+            farthest = self._find_farthest_pairs(X, labels, cholesky_factors)
 
             # Batch assignment step 
-            new_labels = self._assign_clusters(
-                X, labels, mu, cholesky_factors, logdet_M, farthest, 
-                ml_graph, cl_graph
-            )
+            new_labels = self._assign_clusters(X, labels, mu, cholesky_factors, logdet_M, farthest, ml_graph, cl_graph)
 
             # Repair empty clusters 
-            new_labels = self._repair_empty_clusters(
-                X, new_labels, mu, cholesky_factors
-                )
+            new_labels = self._repair_empty_clusters(X, new_labels, mu, cholesky_factors)
 
             # Update centroids
             mu = self._update_centroids(X, new_labels)
 
             # Update precision matrices 
-            M = self._update_metrics(
-                X, new_labels, mu, cholesky_factors, farthest,
-                ml_graph, cl_graph
-            )
+            M = self._update_metrics(X, new_labels, mu, cholesky_factors, farthest, ml_graph, cl_graph)
 
             labels = new_labels
 
@@ -102,16 +84,13 @@ class MPCKMeans:
 
     def _preprocess_constraints(self, P, must_link, cannot_link):       
         """
-        This method preprocesses the pairwise constraints by 
-        constructing the Must-Link and Cannot-Link graphs and 
-        extracting Must-Link connected components (neighborhoods).
+        This method preprocesses the pairwise constraints by constructing 
+        the Must-Link and Cannot-Link graphs and extracting Must-Link connected components (neighborhoods).
     
         :arg(P, must_link, cannot_link):
             P = number of data points
-            must_link = pairs (i, j) that should belong to the 
-                        same cluster
-            cannot_link = pairs (i, j) that should belong to
-                          different clusters
+            must_link = pairs (i, j) that should belong to the same cluster
+            cannot_link = pairs (i, j) that should belong to different clusters
     
         :return:
             ml_graph = dictionary encoding the Must-Link graph
@@ -161,14 +140,12 @@ class MPCKMeans:
 
     def _dfs(self, start, G, visited):       
         """
-        Method that performs a Depth-First Search (DFS) on the 
-        Must-Link graph starting from a given node and 
-        returns the corresponding connected component.
+        Method that performs a Depth-First Search (DFS) on the Must-Link graph 
+        starting from a given node and returns the corresponding connected component.
     
         :arg(start, G, visited):
             start = index of the starting node
-            G = must-link graph; 
-                dictionary mapping each point to its neighbors
+            G = must-link graph; dictionary mapping each point to its neighbors
             visited = boolean array tracking already visited nodes
     
         :return: list of node indices forming the connected component
@@ -190,11 +167,9 @@ class MPCKMeans:
   
     def _initialize_cluster_centers(self, X, neighborhoods):       
         """
-        This function initializes cluster centroids using Must-Link 
-        neighborhoods when available.        
-        If the number of neighborhoods exceeds K, a weighted  
-        farthest-first selection is used. If fewer than K neighborhoods 
-        exist, the remaining centroids are generated as perturbations 
+        This function initializes cluster centroids using Must-Link neighborhoods when available.        
+        If the number of neighborhoods exceeds K, a weighted farthest-first selection is used. 
+        If fewer than K neighborhoods exist, the remaining centroids are generated as perturbations 
         of the global centroid.
     
         :arg(X, neighborhoods):
@@ -205,10 +180,8 @@ class MPCKMeans:
         """
         # If neighborhoods exist, compute one centroid per neighborhood 
         if neighborhoods:
-            neigh_centroids = np.vstack(
-                [X[idx].mean(axis = 0) for idx in neighborhoods])
-            neigh_sizes = np.array(
-                [len(idx) for idx in neighborhoods], dtype = float)
+            neigh_centroids = np.vstack([X[idx].mean(axis = 0) for idx in neighborhoods])
+            neigh_sizes = np.array([len(idx) for idx in neighborhoods], dtype = float)
             neigh_weights = neigh_sizes / neigh_sizes.sum()
         else:
             neigh_centroids = np.empty((0, X.shape[1]))
@@ -216,9 +189,7 @@ class MPCKMeans:
     
         # Case lambda > K: weighted farthest-first selection
         if neigh_centroids.shape[0] > self.K:
-            chosen = self._weighted_farthest_first(
-                neigh_centroids, neigh_weights, self.K
-                )
+            chosen = self._weighted_farthest_first(neigh_centroids, neigh_weights, self.K)
             return neigh_centroids[chosen]
         
         centroids = neigh_centroids
@@ -227,8 +198,7 @@ class MPCKMeans:
         if centroids.shape[0] < self.K:
             global_centroid = X.mean(axis = 0)
             missing = self.K - centroids.shape[0]
-            noise = self.rng.normal(
-                0.0, 0.01, size = (missing, X.shape[1])) 
+            noise = self.rng.normal(0.0, 0.01, size = (missing, X.shape[1])) 
             extra = global_centroid[None, :] + noise   
             if centroids.size:
                 centroids = np.vstack([centroids, extra])  
@@ -239,8 +209,7 @@ class MPCKMeans:
 
     def _weighted_farthest_first(self, points, weights, k):       
         """
-        This method selects k representative points using a 
-        weighted farthest-first traversal strategy.
+        This method selects k representative points using a weighted farthest-first traversal strategy.
 
         :arg(points, weights, k):
             points = array of candidate points (centroids)
@@ -281,8 +250,7 @@ class MPCKMeans:
                     continue
     
                 # distance to the nearest selected centroid (Euclidean)
-                dists = np.sqrt(np.sum(
-                    (chosen_points - points[j]) ** 2, axis = 1))
+                dists = np.sqrt(np.sum((chosen_points - points[j]) ** 2, axis = 1))
                 d_min = float(dists.min())
     
                 val = float(weights[j]) * d_min
@@ -317,9 +285,8 @@ class MPCKMeans:
     
     def _regularize_metric(self, M):       
         """
-        Function that regularizes a cluster metric matrix to ensure that 
-        it is symmetric positive definite (SPD), and computes its
-        Cholesky factor and log-determinant in a numerically stable way.
+        Function that regularizes a cluster metric matrix to ensure that it is symmetric positive definite (SPD),
+        and computes its Cholesky factor and log-determinant in a numerically stable way.
         
         :arg(M):
             M = metric matrix of shape (N, N)
@@ -356,8 +323,7 @@ class MPCKMeans:
 
     def _factorize_metrics(self, M):       
         """
-        This method regularizes and factorizes each cluster inverse
-        metric matrix.    
+        This method regularizes and factorizes each cluster inverse metric matrix.    
            
         :arg(M):
             M = array of shape (K, N, N) containing A_k^{-1}
@@ -380,8 +346,8 @@ class MPCKMeans:
 
     def _mahalanobis_sq(self, d, L):      
         """
-        This function computes the squared Mahalanobis distance
-        d^T A d using the Cholesky factor of M = A^{-1}.
+        This function computes the squared Mahalanobis distance d^T A d 
+        using the Cholesky factor of M = A^{-1}.
     
         :arg(d, L):
             d = difference vector between a data point and the centroid
@@ -397,17 +363,15 @@ class MPCKMeans:
         """
         Method that identifies, for each cluster, the pair of points
         with maximum Mahalanobis distance under cluster-specific metric.    
-        The resulting pairs are used in the Cannot-Link term 
-        of the objective function.
+        The resulting pairs are used in the Cannot-Link term of the objective function.
     
         :arg(X, labels, cholesky_factors):
             X = data matrix of shape (P, N)
             labels = array of current cluster assignments 
             cholesky_factors = array of Cholesky factors 
     
-        :return: farthest = dictionary mapping each cluster k to
-                           (i_max, j_max, dist_max), or None if the 
-                           cluster contains fewer than two points
+        :return: farthest = dictionary mapping each cluster k to (i_max, j_max, dist_max), 
+                            or None if the cluster contains fewer than two points
         """
         farthest = {}
         for k in range(self.K):
@@ -431,20 +395,17 @@ class MPCKMeans:
             farthest[k] = best
         return farthest
 
-    def _assign_clusters(self, X, labels_prev, mu, cholesky_factors, 
-                         logdet, farthest, ml_graph, cl_graph):      
+    def _assign_clusters(self, X, labels_prev, mu, cholesky_factors, logdet, farthest, ml_graph, cl_graph):      
         """
         This method performs the assignment step of MPCK-Means.
         
-        :arg(X, labels_prev, mu, cholesky_factors, logdet,
-             farthest, ml_graph, cl_graph):
+        :arg(X, labels_prev, mu, cholesky_factors, logdet, farthest, ml_graph, cl_graph):
             X = data matrix of shape (P, N)
             labels_prev = cluster assignments from the previous iteration
             mu = current centroid matrix of shape (K, N)
             cholesky_factors = Cholesky factors of M_k = A_k^{-1}
             logdet = log-determinants of M_k
-            farthest = dictionary of farthest intra-cluster pairs 
-                      (for Cannot-Link term)
+            farthest = dictionary of farthest intra-cluster pairs (for Cannot-Link term)
             ml_graph = Must-Link graph
             cl_graph = Cannot-Link graph
     
@@ -457,8 +418,7 @@ class MPCKMeans:
             for k in range(self.K):
                 # Calculate the cost of assigning point x^i to cluster k
                 cost = self._assignment_cost(
-                    X, i, k, labels_prev, mu, cholesky_factors[k], 
-                    logdet[k], farthest.get(k), ml_graph, cl_graph
+                    X, i, k, labels_prev, mu, cholesky_factors[k], logdet[k], farthest.get(k), ml_graph, cl_graph
                 )
                 costs.append(cost)
             # Assign x^i to the cluster with minimum cost
@@ -466,14 +426,12 @@ class MPCKMeans:
 
         return new_labels
 
-    def _assignment_cost(self, X, i, k, labels, mu, Lk, logdet_Mk,
-                         farthest_k, ml_graph, cl_graph):          
+    def _assignment_cost(self, X, i, k, labels, mu, Lk, logdet_Mk, farthest_k, ml_graph, cl_graph):          
         """
-        This method computes the cost of assigning data point x^i 
-        to cluster k, keeping the remaining assignments fixed.
+        This method computes the cost of assigning data point x^i to cluster k, 
+        keeping the remaining assignments fixed.
     
-        :arg(X, i, k, labels, mu, Lk, logdet_Mk, farthest_k, 
-             ml_graph, cl_graph):
+        :arg(X, i, k, labels, mu, Lk, logdet_Mk, farthest_k, ml_graph, cl_graph):
             X = data matrix of shape (P, N)
             i = index of the data point to assign
             k = candidate cluster index
@@ -495,9 +453,7 @@ class MPCKMeans:
         # Must-Link violations
         for j in ml_graph[i]:
             if labels[j] != k:
-                cost += (
-                    0.5 * self.w * self._mahalanobis_sq(X[i] - X[j], Lk)
-                    )
+                cost += (0.5 * self.w * self._mahalanobis_sq(X[i] - X[j], Lk))
 
         # Cannot-Link violations
         if farthest_k is not None:
@@ -511,11 +467,9 @@ class MPCKMeans:
 
     def _repair_empty_clusters(self, X, labels, mu, cholesky_factors):       
         """
-        This method prevents clusters from remaining empty after the 
-        assignment step.    
-        If a cluster is empty, a point is moved from another
-        cluster (with at least two points), selecting the one farthest
-        from its current centroid under the cluster-specific metric.
+        This method prevents clusters from remaining empty after the assignment step.    
+        If a cluster is empty, a point is moved from anothercluster (with at least two points),
+        selecting the one farthest from its current centroid under the cluster-specific metric.
     
         :arg(X, labels, mu, cholesky_factors):
             X = data matrix of shape (P, N)
@@ -523,8 +477,7 @@ class MPCKMeans:
             mu = centroid matrix of shape (K, N)
             cholesky_factors = Cholesky factors of M_k = A_k^{-1}
     
-        :return: labels = updated cluster assignments with 
-                          no empty clusters
+        :return: labels = updated cluster assignments with no empty clusters
         """ 
         # number of points per cluster
         counts = np.bincount(labels, minlength = self.K)
@@ -547,8 +500,7 @@ class MPCKMeans:
                 # idx are the indices of points in cluster k
                 idx = np.where(labels == k)[0]
                 for p in idx:
-                    d = self._mahalanobis_sq(
-                        X[p] - mu[k], cholesky_factors[k])
+                    d = self._mahalanobis_sq(X[p] - mu[k], cholesky_factors[k])
                     if d > best_d:
                         best_d = d
                         best_p = p
@@ -568,8 +520,7 @@ class MPCKMeans:
 
     def _update_centroids(self, X, labels):       
         """
-        This method updates the cluster centroids based on the current
-        cluster assignments.
+        This method updates the cluster centroids based on the current cluster assignments.
         
         :arg(X, labels):
             X = data matrix of shape (P, N)
@@ -584,18 +535,15 @@ class MPCKMeans:
         return mu
   
     # METRIC UPDATE
-    def _update_metrics(self, X, labels, mu, cholesky_factors, 
-                        farthest, ml_graph, cl_graph):
+    def _update_metrics(self, X, labels, mu, cholesky_factors, farthest, ml_graph, cl_graph):
         """
-        This method updates the cluster-specific inverse metric
-        matrices A_k^{-1}.    
+        This method updates the cluster-specific inverse metric matrices A_k^{-1}.    
         For each cluster k, the update combines:
             - the intra-cluster scatter term,
             - the Must-Link penalty term,
             - the Cannot-Link hinge-based penalty term.
     
-        :arg(X, labels, mu, cholesky_factors, farthest, ml_graph, 
-             cl_graph):
+        :arg(X, labels, mu, cholesky_factors, farthest, ml_graph, cl_graph):
             X = data matrix of shape (P, N)
             labels = current cluster assignments 
             mu = centroid matrix of shape (K, N)
@@ -645,13 +593,11 @@ class MPCKMeans:
                     for j in cl_graph[i]:
                         if j > i and labels[j] == k:
                             dvec = X[i] - X[j]
-                            dist_ij = self._mahalanobis_sq(
-                                dvec, cholesky_factors[k])
+                            dist_ij = self._mahalanobis_sq(dvec, cholesky_factors[k])
                             hinge = max(dist_max - dist_ij, 0.0)
                             if hinge > 0:
                                 v = dvec.reshape(-1, 1)
-                                cl_term += self.w * hinge * (
-                                    outer_max - v @ v.T)
+                                cl_term += self.w * hinge * (outer_max - v @ v.T)
                                    
             # A_k^{-1} = (scatter + ML + CL) / |C_k|
             Mk = (scatter + ml_term + cl_term) / n_k
