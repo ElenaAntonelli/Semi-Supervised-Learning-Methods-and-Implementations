@@ -46,22 +46,17 @@ class LapTwinSVM(object):
         n_nb = self.opt['n_neighbor'] 
 
         if mode == 'connectivity': # unweighted graph
-            W = kneighbors_graph(
-                X, n_nb, mode='connectivity', include_self=False)
+            W = kneighbors_graph(X, n_nb, mode='connectivity', include_self=False)
             W = (((W + W.T) > 0) * 1) # makes the matrix symmetric
 
         elif mode == 'distance':
-            # the distance between neighbors is measured with a 
-            # specified metric
-            W = kneighbors_graph(
-                X, n_nb, mode='distance', include_self=False)
+            # the distance between neighbors is measured with a specified metric
+            W = kneighbors_graph(X, n_nb, mode='distance', include_self=False)
             W = W.maximum(W.T)
             # Gaussian weights with heat parameter t
             t = float(self.opt['t'])
-            W = sparse.csr_matrix(
-                (np.exp(-W.data**2 / (4.0 * t)), W.indices, W.indptr),
-                shape=(X.shape[0], X.shape[0])
-            )
+            W = sparse.csr_matrix((np.exp(-W.data**2 / (4.0 * t)), W.indices, W.indptr),
+                shape=(X.shape[0], X.shape[0]))
         else:
             raise ValueError(
                 "neighbor_mode must be 'connectivity' or 'distance'"
@@ -74,8 +69,7 @@ class LapTwinSVM(object):
 
     def _kernel(self, X1, X2):
         '''        
-        This method computes the kernel matrix K_ij = k(x_i, x_j)  
-        between two sets of data points X1,X2.
+        This method computes the kernel matrix K_ij = k(x_i, x_j) between two sets of data points X1,X2.
         
         :arg(X1,X2): 
             X1 = ndarray; first input dataset
@@ -83,8 +77,7 @@ class LapTwinSVM(object):
         
         : return: kernel matrix K      
         '''        
-        K_matrix = self.opt['kernel_function'](
-            X1, X2, **self.opt['kernel_parameters'])       
+        K_matrix = self.opt['kernel_function'](X1, X2, **self.opt['kernel_parameters'])       
         return K_matrix
 
     
@@ -93,12 +86,9 @@ class LapTwinSVM(object):
         Train the Laplacian Twin SVM.
 
         :arg(X_l,Y_l,X_u): 
-            X_l = labeled data, 
-                  ndarray shape (n_labeled_samples, n_features)
-            Y_l = labels of labeled data, 
-                  ndarray shape (n_labeled_samples,)
-            X_u = unlabeled data, 
-                  ndarray shape (n_unlabeled_samples, n_features)               
+            X_l = labeled data, ndarray shape (n_labeled_samples, n_features)
+            Y_l = labels of labeled data, ndarray shape (n_labeled_samples,)
+            X_u = unlabeled data, ndarray shape (n_unlabeled_samples, n_features)               
         """              
         self.X = np.vstack([X_l, X_u]) # X = entire dataset 
         P = self.X.shape[0] # number of rows of the matrix X
@@ -274,10 +264,8 @@ class LapTwinSVM(object):
         
         # Reports whether the algorithm converged or not
         if self.verbose:
-            print("Optimization '+' success:",
-                  res_pos.success, res_pos.message)
-            print("Optimization '-' success:",
-                  res_neg.success, res_neg.message)
+            print("Optimization '+' success:", res_pos.success, res_pos.message)
+            print("Optimization '-' success:", res_neg.success, res_neg.message)
         return self
    
     def _decision_pair(self, Xtest):
@@ -296,20 +284,15 @@ class LapTwinSVM(object):
         # Computing K over test points by calling the function _kernel
         K_tx = self._kernel(self.X, Xtest)            # (P x n_test)
 
-        fpos = (
-            (self.alpha_star_pos.T @ K_tx).ravel() 
-            + self.theta_star_pos)
-        fneg = (
-            (self.alpha_star_neg.T @ K_tx).ravel() 
-            + self.theta_star_neg)
+        fpos = ((self.alpha_star_pos.T @ K_tx).ravel() + self.theta_star_pos)
+        fneg = ((self.alpha_star_neg.T @ K_tx).ravel() + self.theta_star_neg)
         return fpos, fneg
 
 
     def decision_function(self, Xtest):
         """        
-        Function that compute a decision score for each test sample 
-        based on the relative distance to the two twin hyperplanes.
-        A positive score indicates classification as +1,
+        Function that compute a decision score for each test sample based on the relative distance
+        to the two twin hyperplanes. A positive score indicates classification as +1,
         a negative score indicates classification as -1.
         
         :arg(Xtest):
@@ -322,14 +305,9 @@ class LapTwinSVM(object):
         # ||w|| = sqrt(alpha^T K alpha), K over all training + unlabeled
         K = self._K_train
         eps = 1e-12
-        nrm_pos = float(np.sqrt(
-            self.alpha_star_pos.T @ K @ self.alpha_star_pos
-            ) + eps)
-        nrm_neg = float(np.sqrt(
-            self.alpha_star_neg.T @ K @ self.alpha_star_neg
-            ) + eps)
-        # 1e-12 to stabilize the denominator and prevent
-        # divisions or zero roots
+        nrm_pos = float(np.sqrt(self.alpha_star_pos.T @ K @ self.alpha_star_pos) + eps)
+        nrm_neg = float(np.sqrt(self.alpha_star_neg.T @ K @ self.alpha_star_neg) + eps)
+        # 1e-12 to stabilize the denominator and prevent divisions or zero roots
         
         # Compute distances to each hyperplane
         dpos = np.abs(fpos) / nrm_pos
@@ -340,8 +318,7 @@ class LapTwinSVM(object):
 
     def predict(self, Xtest):
         '''       
-        This method predicts the label for each point in Xtest using 
-        decision_function.
+        This method predicts the label for each point in Xtest using decision_function.
         
         :arg(Xtest): 
             Xtest = test data, ndarray shape (n_samples, n_features)
@@ -375,8 +352,7 @@ def rbf(X1, X2, **kwargs):
     
     :arg(X1, X2, **kwargs):
         X1, X2 = two sets of samples
-        **kwargs = dictionary that collects all the optional parameters  
-                   passed to the function via keyword.
+        **kwargs = dictionary that collects all the optional parameters passed to the function via keyword.
                    Inside kwargs there is a key-value pair where:
                     - Keys are the names of the arguments 
                     - Values ​​are the associated values 
