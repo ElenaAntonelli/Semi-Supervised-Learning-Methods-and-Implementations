@@ -28,12 +28,9 @@ class LapSVM(object):
         This method is used to train the LapSVM model.
         
         :arg(X_l,Y_l,X_u): 
-            X_l = labeled data, 
-                  ndarray shape (n_labeled_samples, n_features)
-            Y_l = labels of labeled data, 
-                  ndarray shape (n_labeled_samples,)
-            X_u = unlabeled data, 
-                  ndarray shape (n_unlabeled_samples, n_features)  
+            X_l = labeled data, ndarray shape (n_labeled_samples, n_features)
+            Y_l = labels of labeled data, ndarray shape (n_labeled_samples,)
+            X_u = unlabeled data, ndarray shape (n_unlabeled_samples, n_features)  
         '''
         
         # GRAPH CONSTRUCTION
@@ -46,25 +43,19 @@ class LapSVM(object):
         # unweighted graph
             
             # use of knn for graph construction
-            W = kneighbors_graph(self.X, self.opt['n_neighbor'],
-                                 mode='connectivity',
-                                 include_self=False) 
+            W = kneighbors_graph(self.X, self.opt['n_neighbor'], mode='connectivity', include_self=False) 
             W = (((W + W.T) > 0) * 1) # makes the matrix symmetric
                      
         elif self.opt['neighbor_mode'] == 'distance':
             # mode = 'distance' will return the distances between 
-            # neighbors according to the given metric
-            # (Minkowski by default)
-            W = kneighbors_graph(self.X, self.opt['n_neighbor'],
-                                 mode = 'distance',include_self = False)
+            # neighbors according to the given metric (Minkowski by default)
+            W = kneighbors_graph(self.X, self.opt['n_neighbor'], mode = 'distance',include_self = False)
             W = W.maximum(W.T) # Symmetrize by assigning Wij = Wji 
                                # the maximum between the two
             
             # Apply Gaussian weights 
-            W = sparse.csr_matrix((np.exp(-W.data**2/4/self.opt['t']),
-                                   W.indices, W.indptr),
-                                   shape=(self.X.shape[0],
-                                   self.X.shape[0])) 
+            W = sparse.csr_matrix((np.exp(-W.data**2/4/self.opt['t']), W.indices, W.indptr),
+                                   shape=(self.X.shape[0], self.X.shape[0])) 
             # W is in CSR (Compressed Sparse Row) format
         else:
             raise Exception()
@@ -78,23 +69,18 @@ class LapSVM(object):
             
         
         # Computing K with k(i,j) = kernel(i, j)
-        K = self.opt['kernel_function'](self.X,self.X,
-                                        **self.opt['kernel_parameters'])
-        
-        
+        K = self.opt['kernel_function'](self.X, self.X, **self.opt['kernel_parameters'])
+                
         # Matrices preparation for dual formulation
         l = X_l.shape[0] # l = P'
         u = X_u.shape[0] # u = P - P'
         
         # Creating matrix J [I (l x l), 0 (l x u)]
-        J = np.concatenate([np.identity(l), 
-                            np.zeros(l * u).reshape(l, u)], axis=1)
+        J = np.concatenate([np.identity(l), np.zeros(l * u).reshape(l, u)], axis=1)
         
         # Computing "almost" alpha (without beta)
-        almost_alpha = np.linalg.inv(2 * self.opt['gamma_A'] * 
-                                     np.identity(l + u) \
-                                     + (2 * self.opt['gamma_I']) *
-                                     L.dot(K)).dot(J.T).dot(Y)
+        almost_alpha = np.linalg.inv(2 * self.opt['gamma_A'] * np.identity(l + u) \
+                                     + (2 * self.opt['gamma_I']) * L.dot(K)).dot(J.T).dot(Y)
         
         # Computing Q
         Q = Y.dot(J).dot(K).dot(almost_alpha)
@@ -128,15 +114,12 @@ class LapSVM(object):
         def constraint_grad(beta):
             return Y_l
 
-        cons = {'type': 'eq', 'fun': constraint_func, 
-                'jac': constraint_grad}
+        cons = {'type': 'eq', 'fun': constraint_func, 'jac': constraint_grad}
 
         # ===== Solving =====
         x0 = np.zeros(l)
 
-        beta_star = minimize(objective_func, x0,
-                            jac=objective_grad, constraints=cons,
-                            bounds=bounds)['x']
+        beta_star = minimize(objective_func, x0, jac=objective_grad, constraints=cons, bounds=bounds)['x']
         # x0: Initial guess for the parameters;
         # jac = Jacobian
         
@@ -147,8 +130,7 @@ class LapSVM(object):
         del almost_alpha, Q
 
         # Estimating the bias term (theta*) using labeled data
-        new_K = self.opt['kernel_function'](self.X,X_l,
-                                **self.opt['kernel_parameters'])
+        new_K = self.opt['kernel_function'](self.X,X_l, **self.opt['kernel_parameters'])
         f = np.squeeze(np.array(self.alpha_star)).dot(new_K)
         
         # Identifying Support Vector indices
@@ -156,8 +138,7 @@ class LapSVM(object):
         
        
         if len(self.sv_ind) > 0: # if there are support vectors
-            # only the elements of Y and f corresponding to the
-            # support vectors are considered
+            # only the elements of Y and f corresponding to the support vectors are considered
             ys = np.diag(Y)[self.sv_ind] 
             fs = f[self.sv_ind]
             self.theta_star = np.mean(ys - fs)
@@ -184,9 +165,8 @@ class LapSVM(object):
             #       y(i)*f(i) = 1 if the point is exactly on the margin
             
                           
-            # takes the indices of the first k points closest to the 
-            # margin (i.e. those with smaller margin_vals) and 
-            # rearranges them from closest to furthest
+            # takes the indices of the first k points closest to the  margin
+            # (i.e. those with smaller margin_vals) and rearranges them from closest to furthest
             close_points = np.argsort(margin_vals)[:k]
             
             theta_vals = [Y_l[i] - f[i] for i in close_points]
@@ -195,25 +175,22 @@ class LapSVM(object):
         
     def decision_function(self,Xtest):
         '''
-        This method computes the decision function f(x) + theta 
-        for each point in X. The obtained values ​​are not yet 
-        classified labels, but real values.
+        This method computes the decision function f(x) + theta for each point in X.
+        The obtained values ​​are not yet classified labels, but real values.
         
         :arg(Xtest): 
             Xtest = test data, ndarray shape (n_samples, n_features)
             
         : return: f(x) = sum [ alpha_i * k(x_i,x) ] + theta
         '''             
-        new_K = self.opt['kernel_function'](self.X, Xtest,
-                                     **self.opt['kernel_parameters'])
+        new_K = self.opt['kernel_function'](self.X, Xtest, **self.opt['kernel_parameters'])
         f = np.squeeze(np.array(self.alpha_star)).dot(new_K)
         return f + self.theta_star   
         
 
     def predict(self, Xtest):
         '''
-        This method predicts the label for each point in Xtest using 
-        the decision function.
+        This method predicts the label for each point in Xtest using the decision function.
         
         :arg(Xtest): 
             Xtest = test data, ndarray shape (n_samples, n_features)
@@ -246,8 +223,7 @@ def rbf(X1,X2,**kwargs):
     
     :arg(X1, X2, **kwargs):
         X1, X2 = two sets of samples
-        **kwargs = dictionary that collects all the optional parameters passed 
-                   to the function via keyword.
+        **kwargs = dictionary that collects all the optional parameters passed to the function via keyword.
                    Inside kwargs there is a key-value pair where:
                     - Keys are the names of the arguments 
                     - Values ​​are the associated values 
