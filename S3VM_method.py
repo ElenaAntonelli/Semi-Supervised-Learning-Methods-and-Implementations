@@ -69,11 +69,9 @@ class QN_S3VM:
 
         # assign the internal model implementation
         if sparse.issparse(X_l):
-            self.__model = QN_S3VM_Sparse(X_l, L_l, X_u, 
-                                          random_generator, **kw)
+            self.__model = QN_S3VM_Sparse(X_l, L_l, X_u, random_generator, **kw)
         else:
-            self.__model = QN_S3VM_Dense(X_l, L_l, X_u, 
-                                         random_generator, **kw)
+            self.__model = QN_S3VM_Dense(X_l, L_l, X_u, random_generator, **kw)
         
         # Data format unknown
         if self.__model is None:
@@ -93,8 +91,7 @@ class QN_S3VM:
         
         :arg(X, real_valued): 
             X = input data matrix         
-            real_valued = if True, then the real prediction values 
-                          are returned
+            real_valued = if True, then the real prediction values are returned
             
         : return: list of predictions for X 
         """
@@ -140,8 +137,7 @@ class QN_S3VM:
 
     def getNeededFunctionCalls(self):
         """
-        Function that returns the number of function calls needed during 
-        the optimization process.      
+        Function that returns the number of function calls needed during the optimization process.      
         """
         return self.__model.getNeededFunctionCalls()
 
@@ -160,8 +156,7 @@ class LinearKernel:
         :arg(data1, data2, symmetric):
             data1 = first input data matrix
             data2 = second input data matrix
-            symmetric = boolean flag indicating whether the resulting 
-                    kernel matrix is expected to be symmetric          
+            symmetric = boolean flag indicating whether the resulting kernel matrix is expected to be symmetric          
         
         : return: kernel matrix        
         """
@@ -202,8 +197,7 @@ class RBFKernel:
         :arg(data1, data2, symmetric):
             data1 = first input data matrix
             data2 = second input data matrix
-            symmetric = boolean flag indicating whether the resulting
-                        kernel matrix is expected to be symmetric         
+            symmetric = boolean flag indicating whether the resulting kernel matrix is expected to be symmetric         
         
         : return: kernel matrix        
         """
@@ -248,19 +242,17 @@ class QN_S3VM_Dense:
     
     parameters = {
         "lam": 1.0,   # regularization parameter (lambda > 0) 
-        "lamU": 1.0,  # cost parameter that determines influence of
-                      # unlabeled samples; float > 0 
+        "lamU": 1.0,  # cost parameter that determines influence of unlabeled samples; float > 0 
         "sigma": 1.0, #  kernel width for RBF kernel
         "kernel_type": "Linear",  # "Linear" or "RBF"
         
         "numR": None, # implementation of subset of regressors 
                       # if None, all samples are used
         # Must fulfill 0 <= numR <= len(X_l) + len(X_u) 
-        "estimate_r": None, # desired ratio for positive and negative 
-                            # assigments for unlabeled samples
+        "estimate_r": None, # desired ratio for positive and negative assigments for unlabeled samples
                             # (-1.0 <= estimate_r <= 1.0)
         # If estimate_r=None, then L_l is used to estimate this ratio
-        # (in case len(L_l) >= minimum_labeled_patterns_for_estimate_r. 
+        # (in case len(L_l) >= minimum_labeled_patterns_for_estimate_r). 
         # Otherwise use estimate_r = 0.0
         "minimum_labeled_patterns_for_estimate_r": 0,
         
@@ -282,8 +274,7 @@ class QN_S3VM_Dense:
         if random_generator is None:
             self.__random_generator = np.random.default_rng()
         elif isinstance(random_generator, (int, np.integer)):
-            self.__random_generator = np.random.default_rng(
-                int(random_generator))
+            self.__random_generator = np.random.default_rng(int(random_generator))
         elif isinstance(random_generator, np.random.Generator):
             self.__random_generator = random_generator
         else:
@@ -295,8 +286,7 @@ class QN_S3VM_Dense:
         self.__L_l = np.asarray(L_l, dtype=np.float64).reshape(-1)
         assert self.__X_l.shape[0] == self.__L_l.shape[0]
         # assert = to check if a condition is true:
-        # if true nothing happens, 
-        # otherwise Python throws an exception and the program stops
+        # if true nothing happens, otherwise Python throws an exception and the program stops
 
         # full data matrix
         self.__X = np.vstack([self.__X_l, self.__X_u])  
@@ -307,8 +297,7 @@ class QN_S3VM_Dense:
         self.__matrices_initialized = False
         self.__needed_function_calls = 0
         self.__setParameters(**kw)
-        # **kw : pass an arbitrary number of named parameters,
-        #        collected in a dictionary
+        # **kw : pass an arbitrary number of named parameters, collected in a dictionary
         self.__kw = kw
 
     def train(self):
@@ -328,26 +317,19 @@ class QN_S3VM_Dense:
 
         :arg(X, real_valued): 
             X = input data matrix         
-            real_valued = if True, then the real-valued 
-                        prediction are returned
+            real_valued = if True, then the real-valued prediction are returned
             
         : return: list of predictions for X        
         """
         # Only the kernel terms that depend on X are recomputed,
-        # while the centering statistics, computed on the 
-        # unlabeled subset, are kept fixed
+        # while the centering statistics, computed on the unlabeled subset, are kept fixed
         
         X = _as_2d_array(X)
-        KNR = self.__kernel.computeKernelMatrix(
-            X, self.__Xreg, symmetric=False)  # (m, numR)
-        KNU_bar = self.__kernel.computeKernelMatrix(
-            X, self.__X_u_subset, symmetric=False)  # (m, |Ubar|)
-        KNU_bar_horizontal_sum = (
-            1.0 / self.__X_u_subset.shape[0]
-            ) * KNU_bar.sum(axis=1, keepdims=True)  # (m,1)
-        # KNU_bar_horizontal_sum = vector containing, 
-        # for each data point x_i, the mean kernel value 
-        # with respect to the unlabeled subset
+        KNR = self.__kernel.computeKernelMatrix(X, self.__Xreg, symmetric=False)  # (m, numR)
+        KNU_bar = self.__kernel.computeKernelMatrix(X, self.__X_u_subset, symmetric=False)  # (m, |Ubar|)
+        KNU_bar_horizontal_sum = (1.0 / self.__X_u_subset.shape[0]) * KNU_bar.sum(axis=1, keepdims=True)  # (m,1)
+        # KNU_bar_horizontal_sum = vector containing, for each data point x_i, 
+        # the mean kernel value with respect to the unlabeled subset
 
         
         KNR = (
@@ -388,17 +370,15 @@ class QN_S3VM_Dense:
 
     def getNeededFunctionCalls(self):
         """
-        Returns the number of function calls needed during 
-        the optimization process.
+        Returns the number of function calls needed during the optimization process.
         """
         return int(self.__needed_function_calls)
 
 
     def __setParameters(self, **kw):
         """
-        Sets the model hyperparameters by merging user-provided 
-        values with default settings and stores the final 
-        configuration into internal variables.
+        Sets the model hyperparameters by merging user-provided values with default settings 
+        and stores the final configuration into internal variables.
     
         :arg (**kw): 
             kw = dictionary of user-defined parameter overrides     
@@ -411,10 +391,8 @@ class QN_S3VM_Dense:
         assert self.__lam > 0
         self.__lamU = float(self.parameters["lamU"])
         assert self.__lamU > 0
-        self.__lam_Uvec = [self.__lamU * i for i in [
-            0, 0.000001, 0.0001, 0.01, 0.1, 0.5, 1.0]]
-        # the model will be trained several times,
-        # with increasing weights on the unlabeled       
+        self.__lam_Uvec = [self.__lamU * i for i in [0, 0.000001, 0.0001, 0.01, 0.1, 0.5, 1.0]]
+        # the model will be trained several times, with increasing weights on the unlabeled       
         self.__sigma = float(self.parameters["sigma"])
         assert self.__sigma > 0
         
@@ -428,8 +406,7 @@ class QN_S3VM_Dense:
 
         self.__dim = self.__numR + 1  # coefficients + bias
 
-        self.__minimum_labeled_patterns_for_estimate_r = float(
-            self.parameters["minimum_labeled_patterns_for_estimate_r"])
+        self.__minimum_labeled_patterns_for_estimate_r = float(self.parameters["minimum_labeled_patterns_for_estimate_r"])
         if self.parameters["estimate_r"] is not None:
             self.__estimate_r = float(self.parameters["estimate_r"])
         elif len(self.__L_l) >= self.__minimum_labeled_patterns_for_estimate_r:
@@ -441,8 +418,8 @@ class QN_S3VM_Dense:
         self.__BFGS_maxfun = int(self.parameters["BFGS_maxfun"])
         self.__BFGS_factr = float(self.parameters["BFGS_factr"])
         
-        # This is a hack for 64 bit systems. The machine precision 
-        # is different for the BFGS optimizer and this is fixed by:
+        # This is a hack for 64 bit systems. 
+        # The machine precision is different for the BFGS optimizer and this is fixed by:
         if sys.maxsize > 2**32:
             self.__BFGS_factr = 0.000488288 * self.__BFGS_factr
                        
@@ -451,8 +428,7 @@ class QN_S3VM_Dense:
 
         self.__surrogate_gamma = float(self.parameters["surrogate_gamma"])
         self.__s = float(self.parameters["surrogate_s"])
-        self.__breakpoint_for_exp = float(
-            self.parameters["breakpoint_for_exp"])
+        self.__breakpoint_for_exp = float(self.parameters["breakpoint_for_exp"])
 
         self.__b = float(self.__estimate_r)
         self.__max_unlabeled_subset_size = 1000
@@ -465,21 +441,19 @@ class QN_S3VM_Dense:
             if r == 0:
                 self.__regressors_indices = np.array([], dtype=int)
             else:
-                self.__regressors_indices = np.sort(
-                    self.__random_generator.choice(
+                self.__regressors_indices = np.sort(self.__random_generator.choice(
                         self.__size_n, size=r, replace=False).astype(int)
-                )
+                        )
 
     def __optimize(self):
         """
         Runs the main optimization procedure. 
     
-        : return: (c_current, f_opt), where c_current is the 
-                 optimized parameter vector (including bias)
-                 and f_opt is the final objective function value
+        : return: (c_current, f_opt), where:
+                  - c_current is the optimized parameter vector (including bias)
+                  - f_opt is the final objective function value
         """
-        # Resetting the internal counter used to monitor 
-        # how many times the loss is calculated
+        # Resetting the internal counter used to monitor how many times the loss is calculated
         self.__needed_function_calls = 0
         self.__initializeMatrices()
         
@@ -489,8 +463,7 @@ class QN_S3VM_Dense:
         
         
         # Annealing sequence.
-        # Annealing = starting with an easier version of the problem
-        # and gradually making it more difficult
+        # Annealing = starting with an easier version of the problem and gradually making it more difficult
         for lamU in self.__lam_Uvec: 
         # every solution is the starting point for the next step
             self.__lamU = float(lamU)
@@ -553,10 +526,8 @@ class QN_S3VM_Dense:
         self.__Xreg = self.__X[self.__regressors_indices, :]  # (numR, d)
 
         # kernel blocks
-        self.__KLR = self.__kernel.computeKernelMatrix(
-            self.__X_l, self.__Xreg, symmetric=False)  # (l, R)
-        self.__KUR = self.__kernel.computeKernelMatrix(
-            self.__X_u, self.__Xreg, symmetric=False)  # (u, R)
+        self.__KLR = self.__kernel.computeKernelMatrix(self.__X_l, self.__Xreg, symmetric=False)  # (l, R)
+        self.__KUR = self.__kernel.computeKernelMatrix(self.__X_u, self.__Xreg, symmetric=False)  # (u, R)
         self.__KNR = np.vstack([self.__KLR, self.__KUR])  # (n, R)
         self.__KRR = self.__KNR[self.__regressors_indices, :]  # (R, R)
 
@@ -566,29 +537,20 @@ class QN_S3VM_Dense:
         if s == 0:
             subset_unlabeled_indices = np.array([], dtype=int)
         else:
-            subset_unlabeled_indices = np.sort(
-                self.__random_generator.choice(
+            subset_unlabeled_indices = np.sort(self.__random_generator.choice(
                     self.__size_u, size=s, replace=False).astype(int)
-            )
+                    )
         self.__X_u_subset = self.__X_u[subset_unlabeled_indices, :]  # (|Ubar|, d)
 
         # compute centering terms
-        KNU_bar = self.__kernel.computeKernelMatrix(
-            self.__X, self.__X_u_subset, symmetric=False)  # (n,|Ubar|)
-        KNU_bar_horizontal_sum = (1.0 / self.__X_u_subset.shape[0]
-                                  ) * KNU_bar.sum(axis=1, keepdims=True)  # (n,1)       
+        KNU_bar = self.__kernel.computeKernelMatrix(self.__X, self.__X_u_subset, symmetric=False)  # (n,|Ubar|)
+        KNU_bar_horizontal_sum = (1.0 / self.__X_u_subset.shape[0]) * KNU_bar.sum(axis=1, keepdims=True)  # (n,1)       
         
-        KU_barR = self.__kernel.computeKernelMatrix(
-            self.__X_u_subset, self.__Xreg, symmetric=False)  # (|Ubar|,R)
-        self.__KU_barR_vertical_sum = (1.0 / self.__X_u_subset.shape[0]
-                                       ) * KU_barR.sum(axis=0, keepdims=True)  # (1,R)
+        KU_barR = self.__kernel.computeKernelMatrix(self.__X_u_subset, self.__Xreg, symmetric=False)  # (|Ubar|,R)
+        self.__KU_barR_vertical_sum = (1.0 / self.__X_u_subset.shape[0]) * KU_barR.sum(axis=0, keepdims=True)  # (1,R)
 
-        KU_barU_bar = self.__kernel.computeKernelMatrix(
-            self.__X_u_subset, self.__X_u_subset, symmetric=False)
-        self.__KU_barU_bar_sum = float(
-            (1.0 / (self.__X_u_subset.shape[0] ** 2)
-             ) * KU_barU_bar.sum()
-            )
+        KU_barU_bar = self.__kernel.computeKernelMatrix(self.__X_u_subset, self.__X_u_subset, symmetric=False)
+        self.__KU_barU_bar_sum = float((1.0 / (self.__X_u_subset.shape[0] ** 2)) * KU_barU_bar.sum())
 
         # center KNR and derive blocks again
         self.__KNR = (
@@ -616,8 +578,7 @@ class QN_S3VM_Dense:
 
     def __getTrainingPredictions(self, real_valued = False):      
         """
-        Computes model predictions on the training set using 
-        the optimized coefficients. 
+        Computes model predictions on the training set using the optimized coefficients. 
         If real_valued is False, returns class labels in {-1, +1};
         otherwise returns the decision values f(x).
     
@@ -625,8 +586,7 @@ class QN_S3VM_Dense:
             real_valued = if True, returns real-valued decision scores;
                           if False, returns class labels
         
-        : return: list of predictions for the training samples 
-                 (real-valued scores or {-1, +1} labels)
+        : return: list of predictions for the training samples (real-valued scores or {-1, +1} labels)
         """
         preds = (self.__KNR @ self.__c[:-1]) + self.__c[-1]  # (n,1)
         preds = preds.reshape(-1)
@@ -647,8 +607,7 @@ class QN_S3VM_Dense:
         
         : return: scalar value of the surrogate objective function
         """
-        # Check whether the function is called from the bfgs solver 
-        # (that does not optimize the offset b) or not
+        # Check whether the function is called from the bfgs solver (that does not optimize the offset b) or not
         c = np.asarray(c, dtype=np.float64).reshape(-1)
         if c.shape[0] == self.__dim - 1:
             c = np.append(c, self.__b)
@@ -656,13 +615,11 @@ class QN_S3VM_Dense:
         b = float(c[-1])
         c_new = c[:-1].reshape(-1, 1)  
 
-        preds_labeled = self.__surrogate_gamma * (
-            1.0 - (self.__YL * ((self.__KLR @ c_new) + b)))
+        preds_labeled = self.__surrogate_gamma * (1.0 - (self.__YL * ((self.__KLR @ c_new) + b)))
         preds_unlabeled = (self.__KUR @ c_new) + b
         
         # Goal: handle cases where preds_labeled is very large
-        conflict = np.sign(np.sign(
-            preds_labeled / self.__breakpoint_for_exp - 1.0) + 1.0)
+        conflict = np.sign(np.sign(preds_labeled / self.__breakpoint_for_exp - 1.0) + 1.0)
         # conflict has a one for each "numerically instable" entry; 
         # zeros for "good ones"
         good = -1.0 * (conflict - 1.0) 
@@ -680,21 +637,15 @@ class QN_S3VM_Dense:
         
         # Replace critical values 
         # Note! For unstable values ​​log(1+e^z) is approximated by z
-        preds_labeled_final = (
-            preds_labeled_log_exp + preds_labeled_for_conflicts
-            )
+        preds_labeled_final = (preds_labeled_log_exp + preds_labeled_for_conflicts)
         
         # Average loss on labeled
-        term1 = (1.0 / (self.__surrogate_gamma * self.__size_l)
-                 ) * float(np.sum(preds_labeled_final))  
+        term1 = (1.0 / (self.__surrogate_gamma * self.__size_l)) * float(np.sum(preds_labeled_final))  
         
-        # Note! Using exp(−sf(x)^2) instead of the theoretical 
-        # quantity (1-f(x)) because L-BFGS requires a smooth function
+        # Note! Using exp(−sf(x)^2) instead of the theoretical quantity (1-f(x)) 
+        # because L-BFGS requires a smooth function
         preds_unlabeled_squared = preds_unlabeled * preds_unlabeled
-        term2 = (float(self.__lamU) / float(self.__size_u)
-                 ) * float(np.sum(np.exp(
-                     -self.__s * preds_unlabeled_squared
-                     )))
+        term2 = (float(self.__lamU) / float(self.__size_u)) * float(np.sum(np.exp(-self.__s * preds_unlabeled_squared)))
 
         term3 = float(self.__lam * (c_new.T @ self.__KRR @ c_new))
 
@@ -702,19 +653,16 @@ class QN_S3VM_Dense:
 
     def __getFitness_Prime(self, c):       
         """
-        Computes the gradient of the surrogate objective function
-        with respect to the model coefficients.
+        Computes the gradient of the surrogate objective function with respect to the model coefficients.
         This gradient is provided to the L-BFGS optimizer.
     
         :arg(c):
             c = parameter vector;
                 coefficients, optionally including the bias term
         
-        : return: gradient vector with respect to the coefficients 
-                  (bias excluded)
+        : return: gradient vector with respect to the coefficients (bias excluded)
         """             
-        # Check whether the function is called from the bfgs solver 
-        # (that does not optimize the offset b) or not
+        # Check whether the function is called from the bfgs solver (that does not optimize the offset b) or not
         c = np.asarray(c, dtype=np.float64).reshape(-1)
         if c.shape[0] == self.__dim - 1:
             c = np.append(c, self.__b)
@@ -722,12 +670,10 @@ class QN_S3VM_Dense:
         b = float(c[-1])
         c_new = c[:-1].reshape(-1, 1)  
 
-        preds_labeled = self.__surrogate_gamma * (
-            1.0 - (self.__YL * ((self.__KLR @ c_new) + b)))
+        preds_labeled = self.__surrogate_gamma * (1.0 - (self.__YL * ((self.__KLR @ c_new) + b)))
         preds_unlabeled = (self.__KUR @ c_new) + b
 
-        conflict = np.sign(np.sign(
-            preds_labeled / self.__breakpoint_for_exp - 1.0) + 1.0)
+        conflict = np.sign(np.sign(preds_labeled / self.__breakpoint_for_exp - 1.0) + 1.0)
         good = -1.0 * (conflict - 1.0)
 
         preds_labeled = preds_labeled * good
@@ -738,14 +684,11 @@ class QN_S3VM_Dense:
         term1 = term1 + conflict
         term1 = self.__YL * term1  
 
-        preds_unlabeled_sq_exp_f = np.exp(
-            -self.__s * (preds_unlabeled * preds_unlabeled)
-            )
+        preds_unlabeled_sq_exp_f = np.exp(-self.__s * (preds_unlabeled * preds_unlabeled))
         preds_unlabeled_sq_exp_f = preds_unlabeled_sq_exp_f * preds_unlabeled  
 
         g1 = (-1.0 / self.__size_l) * (self.__KLR.T @ term1)  
-        g2 = ((-2.0 * self.__s * self.__lamU) / float(self.__size_u)
-              ) * (self.__KUR.T @ preds_unlabeled_sq_exp_f)  
+        g2 = ((-2.0 * self.__s * self.__lamU) / float(self.__size_u)) * (self.__KUR.T @ preds_unlabeled_sq_exp_f)  
         g3 = 2.0 * self.__lam * (self.__KRR @ c_new) 
 
         grad = (g1 + g2 + g3).reshape(-1)
@@ -783,8 +726,7 @@ class QN_S3VM_Sparse:
         if random_generator is None:
             self.__random_generator = np.random.default_rng()
         elif isinstance(random_generator, (int, np.integer)):
-            self.__random_generator = np.random.default_rng(
-                int(random_generator))
+            self.__random_generator = np.random.default_rng(int(random_generator))
         elif isinstance(random_generator, np.random.Generator):
             self.__random_generator = random_generator
         else:
@@ -792,17 +734,10 @@ class QN_S3VM_Sparse:
 
         # pad dims if needed
         if X_l.shape[1] > X_u.shape[1]:
-            X_u = sparse.hstack(
-                [X_u, sparse.coo_matrix(
-                    (X_u.shape[0], X_l.shape[1] - X_u.shape[1]))
-                    ])
-            # sparse.coo_matrix creates a sparse matrix filled with zeros 
-            # (in the COO = Coordinate Format format)
+            X_u = sparse.hstack([X_u, sparse.coo_matrix((X_u.shape[0], X_l.shape[1] - X_u.shape[1]))])
+            # sparse.coo_matrix creates a sparse matrix filled with zeros (in the COO = Coordinate Format format)
         elif X_l.shape[1] < X_u.shape[1]:
-            X_l = sparse.hstack(
-                [X_l, sparse.coo_matrix(
-                    (X_l.shape[0], X_u.shape[1] - X_l.shape[1]))
-                    ])
+            X_l = sparse.hstack([X_l, sparse.coo_matrix((X_l.shape[0], X_u.shape[1] - X_l.shape[1]))])
 
         # vertically stack the data matrices into one big matrix
         X = sparse.vstack([X_l, X_u])
@@ -879,8 +814,7 @@ class QN_S3VM_Sparse:
 
     def predictValue(self, x):
         """
-        Computes the real-valued decision function f(x) for 
-        a single input sample (Representer Theorem).
+        Computes the real-valued decision function f(x) for a single input sample (Representer Theorem).
     
         :arg(x):
             x = input sample (array-like or sparse row)
@@ -891,8 +825,7 @@ class QN_S3VM_Sparse:
 
     def getNeededFunctionCalls(self):
         """
-        Returns the number of objective function evaluations 
-        performed during the optimization process.
+        Returns the number of objective function evaluations performed during the optimization process.
         
         : return: number of objective function calls (integer)
         """
@@ -902,14 +835,11 @@ class QN_S3VM_Sparse:
 
     def __setParameters(self, **kw):
         """
-        Sets the model hyperparameters by merging user-provided values
-        with the default configuration and storing the final settings 
-        into internal variables.
+        Sets the model hyperparameters by merging user-provided values with the default configuration
+        and storing the final settings into internal variables.
     
         :arg(**kw):
             kw = dictionary of user-defined parameter overrides 
-        
-        : return: None
         """
         self.parameters = dict(self.parameters)
         self.parameters.update(kw)
@@ -918,11 +848,9 @@ class QN_S3VM_Sparse:
         assert self.__lam > 0
         self.__lamU = float(self.parameters["lamU"])
         assert self.__lamU > 0
-        self.__lam_Uvec = [self.__lamU * i for i in [
-            0, 0.000001, 0.0001, 0.01, 0.1, 0.5, 1.0]]
+        self.__lam_Uvec = [self.__lamU * i for i in [0, 0.000001, 0.0001, 0.01, 0.1, 0.5, 1.0]]
 
-        self.__minimum_labeled_patterns_for_estimate_r = float(
-            self.parameters["minimum_labeled_patterns_for_estimate_r"])
+        self.__minimum_labeled_patterns_for_estimate_r = float(self.parameters["minimum_labeled_patterns_for_estimate_r"])
         
         if self.parameters["estimate_r"] is not None:
             self.__estimate_r = float(self.parameters["estimate_r"])
@@ -949,9 +877,9 @@ class QN_S3VM_Sparse:
         """
         Runs the full optimization procedure.
     
-        : return: (c_current, f_opt), where c_current contains the optimized 
-                 coefficients and bias term, 
-                 and f_opt is the final objective function value
+        : return: (c_current, f_opt), where:
+                  - c_current contains the optimized coefficients and bias term
+                  - f_opt is the final objective function value
         """
         self.__needed_function_calls = 0
         
@@ -1000,15 +928,13 @@ class QN_S3VM_Sparse:
         into the internal model representation.
     
         :arg(indi):
-            indi = optimization output whose first element contains 
-                   the optimized parameter vector
+            indi = optimization output whose first element contains the optimized parameter vector
         """
         self.__c = _col(indi[0], dtype=np.float64)
 
     def __getFitness(self, c):       
         """
-        Evaluates the surrogate objective function for the sparse
-        S3VM formulation.
+        Evaluates the surrogate objective function for the sparse S3VM formulation.
     
         :arg(c):
             c = parameter vector 
@@ -1024,8 +950,7 @@ class QN_S3VM_Sparse:
         c_new = c[:-1].reshape(-1, 1)
         c_new_sum = float(np.sum(c_new))
         
-        # S3VM model predictions in centered feature space, 
-        # using the optimized coefficients.
+        # S3VM model predictions in centered feature space, using the optimized coefficients.
         # It is an alternative form of f(x) = < Phi(x) - mu_U, omega >,
         # where mu_U is the average of the unlabeled features.
         # Kernel representation: self.X_T*c_new = < Phi(x), omega >
@@ -1033,15 +958,10 @@ class QN_S3VM_Sparse:
         XTc = (self.X_T @ c_new) - (self.__mean_u.T * c_new_sum)
         
         # gamma * ( 1 - y_i f(x^i))
-        preds_labeled = self.__surrogate_gamma * (
-            1.0 - (self.__YL * (
-                (self.X_l @ XTc) - (self.__mean_u @ XTc) + b)
-                ))
+        preds_labeled = self.__surrogate_gamma * (1.0 - (self.__YL * ((self.X_l @ XTc) - (self.__mean_u @ XTc) + b)))
         preds_unlabeled = (self.X_u @ XTc) - (self.__mean_u @ XTc) + b
 
-        conflict = np.sign(
-            np.sign(preds_labeled / self.__breakpoint_for_exp - 1.0
-                    ) + 1.0)
+        conflict = np.sign(np.sign(preds_labeled / self.__breakpoint_for_exp - 1.0) + 1.0)
         good = -1.0 * (conflict - 1.0)
         preds_labeled_for_conflicts = conflict * preds_labeled
         preds_labeled = preds_labeled * good
@@ -1051,17 +971,12 @@ class QN_S3VM_Sparse:
         # Compute values for instable entries
         preds_labeled_log_exp = good * preds_labeled_log_exp
         preds_labeled_final = preds_labeled_log_exp + preds_labeled_for_conflicts
-        term1 = (
-            1.0 / (self.__surrogate_gamma * self.__size_l)
-            ) * float(np.sum(preds_labeled_final))
+        term1 = (1.0 / (self.__surrogate_gamma * self.__size_l)) * float(np.sum(preds_labeled_final))
 
         preds_unlabeled_squared = preds_unlabeled * preds_unlabeled
-        term2 = (
-            float(self.__lamU) / float(self.__size_u)
-            ) * float(np.sum(np.exp(-self.__s * preds_unlabeled_squared)))
+        term2 = (float(self.__lamU) / float(self.__size_u)) * float(np.sum(np.exp(-self.__s * preds_unlabeled_squared)))
 
-        term3 = float(self.__lam * (
-            c_new.T @ (self.X @ XTc - self.__mean_u @ XTc)))
+        term3 = float(self.__lam * (c_new.T @ (self.X @ XTc - self.__mean_u @ XTc)))
         return term1 + term2 + term3
 
     def __getFitness_Prime(self, c):       
@@ -1083,13 +998,10 @@ class QN_S3VM_Sparse:
 
         XTc = (self.X_T @ c_new) - (self.__mean_u.T * c_new_sum)
 
-        preds_labeled = self.__surrogate_gamma * (
-            1.0 - (self.__YL * (
-                (self.X_l @ XTc) - (self.__mean_u @ XTc) + b)))
+        preds_labeled = self.__surrogate_gamma * (1.0 - (self.__YL * ((self.X_l @ XTc) - (self.__mean_u @ XTc) + b)))
         preds_unlabeled = (self.X_u @ XTc) - (self.__mean_u @ XTc) + b
 
-        conflict = np.sign(np.sign(
-            preds_labeled / self.__breakpoint_for_exp - 1.0) + 1.0)
+        conflict = np.sign(np.sign(preds_labeled / self.__breakpoint_for_exp - 1.0) + 1.0)
         good = -1.0 * (conflict - 1.0)
 
         preds_labeled = preds_labeled * good
@@ -1100,8 +1012,7 @@ class QN_S3VM_Sparse:
         term1 = term1 + conflict
         term1 = self.__YL * term1
 
-        preds_unlabeled_sq_exp_f = np.exp(
-            -self.__s * (preds_unlabeled * preds_unlabeled))
+        preds_unlabeled_sq_exp_f = np.exp(-self.__s * (preds_unlabeled * preds_unlabeled))
         preds_unlabeled_sq_exp_f = preds_unlabeled_sq_exp_f * preds_unlabeled
 
         term1_sum = float(np.sum(term1))
@@ -1109,18 +1020,13 @@ class QN_S3VM_Sparse:
 
         g1 = (-1.0 / self.__size_l) * ((self.X @ tmp) - (self.__mean_u @ tmp))
 
-        preds_unlabeled_sq_exp_f_sum = float(
-            np.sum(preds_unlabeled_sq_exp_f))
-        tmp_u = (self.X_u_T @ preds_unlabeled_sq_exp_f
-                 ) - (self.__mean_u.T * preds_unlabeled_sq_exp_f_sum)
+        preds_unlabeled_sq_exp_f_sum = float(np.sum(preds_unlabeled_sq_exp_f))
+        tmp_u = (self.X_u_T @ preds_unlabeled_sq_exp_f) - (self.__mean_u.T * preds_unlabeled_sq_exp_f_sum)
 
-        g2 = (
-            (-2.0 * self.__s * self.__lamU) / float(self.__size_u)
-            ) * ((self.X @ tmp_u) - (self.__mean_u @ tmp_u))
+        g2 = ((-2.0 * self.__s * self.__lamU) / float(self.__size_u)) * ((self.X @ tmp_u) - (self.__mean_u @ tmp_u))
 
         XTc_sum = float(np.sum(XTc))
-        g3 = 2.0 * self.__lam * (
-            (self.X @ XTc) - (self.__mean_u @ (XTc_sum)))
+        g3 = 2.0 * self.__lam * ((self.X @ XTc) - (self.__mean_u @ (XTc_sum)))
 
         grad = (g1 + g2 + g3).reshape(-1)
         return grad
