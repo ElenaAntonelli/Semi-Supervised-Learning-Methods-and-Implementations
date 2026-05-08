@@ -25,8 +25,7 @@ from sklearn.neighbors import NearestNeighbors
 
 def _as_pairs_with_weights(pairs, default_w = 1.0):
     """
-    This function converts a set of pairwise constraints into a
-    standard format.
+    This function converts a set of pairwise constraints into a standard format.
 
     :arg(pairs, default_w):
         pairs = collection of pairwise constraints or None
@@ -60,16 +59,14 @@ def _as_pairs_with_weights(pairs, default_w = 1.0):
     return ij, w
 
 
-def _build_W(X, graph_type = "rbf", gamma = None, n_neighbors = 10,
-             include_self = False):
+def _build_W(X, graph_type = "rbf", gamma = None, n_neighbors = 10, include_self = False):
     """
     This function builds the matrix W associated with the data graph.
 
     :arg(X, graph_type, gamma, n_neighbors, include_self):
         X = collection of data points
         graph_type = type of graph ("rbf" or "knn")
-        gamma = scale parameter of the RBF kernel 
-                (automatically estimated if None)
+        gamma = scale parameter of the RBF kernel (automatically estimated if None)
         n_neighbors = number of neighbors used in the kNN graph
         include_self = whether self-connections are included
 
@@ -94,10 +91,7 @@ def _build_W(X, graph_type = "rbf", gamma = None, n_neighbors = 10,
         return W.astype(float)
 
     if graph_type == "knn": # (sparse graph)
-        nn = NearestNeighbors(
-            n_neighbors = n_neighbors, 
-            metric = "cosine"
-            )  
+        nn = NearestNeighbors(n_neighbors = n_neighbors, metric = "cosine")  
         nn.fit(X)
         dists, idx = nn.kneighbors(X)
 
@@ -123,8 +117,7 @@ def _build_W(X, graph_type = "rbf", gamma = None, n_neighbors = 10,
 
 def _laplacian(W, normalized):
     """
-    This function builds the graph Laplacian matrix 
-    starting from a similarity matrix W.
+    This function builds the graph Laplacian matrix starting from a similarity matrix W.
 
     :arg(W, normalized):
         W = input matrix encoding relationships between data points
@@ -150,29 +143,21 @@ def _laplacian(W, normalized):
         return L, d
 
 
-def _build_Q(P, must_link = None, cannot_link = None, 
-             must_weight = 1.0, cannot_weight = 1.0):
+def _build_Q(P, must_link = None, cannot_link = None, must_weight = 1.0, cannot_weight = 1.0):
     """
-    This function builds the constraint matrix Q
-    encoding pairwise supervision.
+    This function builds the constraint matrix Q encoding pairwise supervision.
 
     :arg(P, must_link, cannot_link, must_weight, cannot_weight):
         P = number of data points (size of the matrix Q is P x P)
-        must_link = collection of must-link constraints 
-                    (pairs, optionally with weights)
-        cannot_link = collection of cannot-link constraints 
-                     (pairs, optionally with weights)
-        must_weight = default weight assigned to must-link constraints 
-                      when unweighted
-        cannot_weight = default weight assigned to cannot-link 
-                        constraints when unweighted
+        must_link = collection of must-link constraints (pairs, optionally with weights)
+        cannot_link = collection of cannot-link constraints (pairs, optionally with weights)
+        must_weight = default weight assigned to must-link constraints when unweighted
+        cannot_weight = default weight assigned to cannot-link constraints when unweighted
 
     :return: Q (dense, symmetric, zero diagonal)
     """
-    ml_ij, ml_w = _as_pairs_with_weights(must_link, 
-                                         default_w = must_weight)
-    cl_ij, cl_w = _as_pairs_with_weights(cannot_link, 
-                                         default_w = cannot_weight)
+    ml_ij, ml_w = _as_pairs_with_weights(must_link, default_w = must_weight)
+    cl_ij, cl_w = _as_pairs_with_weights(cannot_link, default_w = cannot_weight)
 
     Q = np.zeros((P, P), dtype=float)
 
@@ -189,11 +174,9 @@ def _build_Q(P, must_link = None, cannot_link = None,
 
 
 class SpectralSSC:
-    def  __init__(self, n_clusters, normalized = True, 
-                  graph_type = "rbf", gamma = None, 
-                  n_neighbors = 10, delta = 0.0, beta_search = True, 
-                  beta_max_eig_margin = 1e-6, beta_search_iters = 30, 
-                  random_state = 0, kmeans_n_init = 20):
+    def  __init__(self, n_clusters, normalized = True, graph_type = "rbf", gamma = None, 
+                  n_neighbors = 10, delta = 0.0, beta_search = True, beta_max_eig_margin = 1e-6,
+                  beta_search_iters = 30, random_state = 0, kmeans_n_init = 20):
         # # Graph construction parameters
         self.n_clusters = int(n_clusters)   # number of clusters K
         self.normalized = bool(normalized)  # for normalized Laplacian
@@ -204,8 +187,7 @@ class SpectralSSC:
         # Constraint-related parameters
         self.delta = float(delta)  # constraint lower bound
         self.beta_search = bool(beta_search) # enable beta search
-        self.beta_max_eig_margin = float(beta_max_eig_margin) 
-        # beta_max_eig_margin = beta safety margin
+        self.beta_max_eig_margin = float(beta_max_eig_margin)  # beta_max_eig_margin = beta safety margin
         self.beta_search_iters = int(beta_search_iters) 
 
         # Optimization / reproducibility
@@ -217,23 +199,18 @@ class SpectralSSC:
         self.embedding_ = None  # spectral embedding
         self.beta_ = None       # selected beta
 
-    def fit(self, X, constraints = None, must_link = None,
-            cannot_link = None, must_weight = 1.0, 
-            cannot_weight = 1.0):       
+    def fit(self, X, constraints = None, must_link = None, cannot_link = None, must_weight = 1.0, cannot_weight = 1.0):       
         """
-        This function fits the semi-supervised spectral clustering 
-        model to the input data X and stores the resulting clustering.
+        This function fits the semi-supervised spectral clustering model
+        to the input data X and stores the resulting clustering.
     
-        :arg(X, constraints, must_link, cannot_link, must_weight,
-             cannot_weight):
+        :arg(X, constraints, must_link, cannot_link, must_weight, cannot_weight):
             X = data matrix 
             constraints = dict of must-link / cannot-link constraints
             must_link = collection of must-link index pairs (or None)
             cannot_link = collection of cannot-link index pairs (or None)
-            must_weight = default weight assigned to must-link 
-                          constraints when unweighted
-            cannot_weight = default weight assigned to cannot-link 
-                            constraints when unweighted
+            must_weight = default weight assigned to must-link constraints when unweighted
+            cannot_weight = default weight assigned to cannot-link constraints when unweighted
         """
         X = np.asarray(X)
         P = X.shape[0]
@@ -245,8 +222,7 @@ class SpectralSSC:
             must_link = constraints.get("must_link", must_link) 
             cannot_link = constraints.get("cannot_link", cannot_link)
 
-        W = _build_W(X, graph_type = self.graph_type, gamma = self.gamma, 
-                     n_neighbors = self.n_neighbors)
+        W = _build_W(X, graph_type = self.graph_type, gamma = self.gamma, n_neighbors = self.n_neighbors)
         L, d = _laplacian(W, normalized = self.normalized)
         
         Q = _build_Q(
@@ -266,8 +242,7 @@ class SpectralSSC:
             self.beta_ = None
             return self
 
-        V, beta = self._constrained_embedding(L, d, Q, K, 
-                                              delta = self.delta)
+        V, beta = self._constrained_embedding(L, d, Q, K, delta = self.delta)
 
         labels = self._cluster_rows(V)
         self.embedding_ = V
@@ -277,8 +252,7 @@ class SpectralSSC:
 
     def fit_predict(self, X, **kwargs):       
         """
-        This method fits the model to the input data X and
-        returns the resulting cluster labels.
+        This method fits the model to the input data X and returns the resulting cluster labels.
     
         :arg(X, **kwargs):
             X = data matrix 
@@ -291,14 +265,12 @@ class SpectralSSC:
 
     def _cluster_rows(self, V):
         """
-        This method assigns cluster labels by applying K-means 
-        to the spectral embedding.
+        This method assigns cluster labels by applying K-means to the spectral embedding.
    
         :arg(V):
             V = spectral embedding matrix (one row per data point)
     
-        :return: array of cluster assignments for each data point 
-                 (labels)
+        :return: array of cluster assignments for each data point (labels)
         """        
         # row-normalize embedding for K-means stability 
         if self.normalized: # with normalized Laplacian
@@ -325,8 +297,7 @@ class SpectralSSC:
         :arg(L, d, K):
             L = graph Laplacian matrix
             d = degree vector 
-            K = target embedding dimension 
-                (equals the number of clusters)
+            K = target embedding dimension (equals the number of clusters)
     
         :return: V = embedding matrix (one row per data point)
         """
@@ -352,16 +323,13 @@ class SpectralSSC:
 
     def _constraint_score(self, V, Q):       
         """
-        This method measures how well an embedding V satisfies 
-        the pairwise constraints encoded in Q.
+        This method measures how well an embedding V satisfies the pairwise constraints encoded in Q.
     
         :arg(V, Q):
-            V = embedding matrix (P x K), 
-                whose columns are embedding directions
+            V = embedding matrix (P x K), whose columns are embedding directions
             Q = constraint matrix (P x P)
         
-        :return: scalar value measuring the average constraint 
-                 satisfaction in V
+        :return: scalar value measuring the average constraint satisfaction in V
         """
         # average quadratic satisfaction: trace(V^T Q V) / K
         K = V.shape[1]
@@ -370,14 +338,12 @@ class SpectralSSC:
 
     def _constrained_embedding(self, L, d, Q, K, delta):         
         """
-        This function computes a constraint-aware spectral embedding 
-        and (optionally) selects beta.
+        This function computes a constraint-aware spectral embedding and (optionally) selects beta.
     
         :arg(L, d, Q, K, delta):
             L = graph Laplacian matrix
             d = degree vector 
-            Q = constraint matrix encoding must-link (positive) 
-                and cannot-link (negative)
+            Q = constraint matrix encoding must-link (positive) and cannot-link (negative)
             K = target embedding dimension
             delta = minimum required constraint satisfaction score
     
@@ -395,8 +361,7 @@ class SpectralSSC:
         I = np.eye(P)
       
         # Minimum eigenvalue of Q 
-        min_eig_Q = float(np.linalg.eigvalsh(np.asarray(
-            Q, dtype = float)).min())
+        min_eig_Q = float(np.linalg.eigvalsh(np.asarray(Q, dtype = float)).min())
         
         # Choosing the initial range for beta
         beta_hi = min_eig_Q - abs(self.beta_max_eig_margin)
@@ -406,8 +371,7 @@ class SpectralSSC:
         def embedding_for_beta(beta):
             B = Q - beta * I
             # solve L v = lambda B v 
-            vals, vecs = la.eigh(np.asarray(
-                L, dtype = float), np.asarray(B, dtype = float))            
+            vals, vecs = la.eigh(np.asarray(L, dtype = float), np.asarray(B, dtype = float))            
             V = vecs[:, :K + 1]
             
             # project out the trivial (constant) direction
