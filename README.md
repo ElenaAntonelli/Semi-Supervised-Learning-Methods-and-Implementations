@@ -15,6 +15,12 @@ Several algorithms were implemented and evaluated through experimental analysis 
 
 ## 🎯 Objectives
 
+- Evaluate the effectiveness of semi-supervised learning methods under different levels of supervision
+- Analyze the impact of dataset characteristics such as class separability, overlap, and dimensionality on model performance
+- Investigate the role of pairwise constraints in semi-supervised clustering tasks
+- Compare the behavior of different semi-supervised approaches for classification and clustering problems
+- Assess the potential of semi-supervised learning in scenarios where labeled data are limited
+
 ---
 
 ## 🔬 Methods
@@ -31,6 +37,25 @@ Several algorithms were implemented and evaluated through experimental analysis 
 ---
 
 ## ⚙️ Experimental Setup
+
+The experimental analysis was performed on 15 UCI datasets using different semi-supervised classification and clustering configurations over multiple independent runs.
+
+### Semi-Supervised Classification
+- Experiments conducted on binary datasets and on three-class datasets transformed into binary problems using a one-vs-two strategy
+- Fixed train/test split with 40% of samples used for testing
+- Partial labeling applied to the training set with supervision levels of 10%, 20%, 30%, and 40%
+- Hyperparameter tuning performed using Optuna with 50 optimization trials
+- 20% of labeled training samples used as validation data
+- Main evaluation metric: Accuracy
+- Precision, Recall, and F1-score additionally analyzed in scenarios characterized by class imbalance
+
+### Semi-Supervised Clustering
+- Experiments conducted on multi-class datasets containing two or more classes
+- Pairwise constraints generated from partially labeled samples
+- Number of constraints evaluated: 0, 50, 100, 200, and 400
+- Fixed Must-Link / Cannot-Link ratio equal to 0.6
+- Partial hyperparameter tuning due to computational limitations
+- Evaluation metrics: NMI, CRI, and Pairwise F1-score
 
 ---
 
@@ -51,6 +76,16 @@ Several algorithms were implemented and evaluated through experimental analysis 
 
 ## 📂 Repository Structure
 
+├── classification/
+│   ├── ApplicationClassification.py
+│   ├── S3VM_method.py
+│   ├── LapSVM_method.py
+│   └── LapTwinSVM_method.py
+│
+└── clustering/
+    ├── ApplicationClustering.py
+    ├── MPCK_Means_method.py
+    └── SpectralSSC_method.py
 
 ---
 
