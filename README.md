@@ -76,6 +76,10 @@ The experimental analysis was performed on 15 UCI datasets using different semi-
 
 ## 📂 Repository Structure
 
+The repository is organized into two main sections:
+- `classification/` contains implementations of semi-supervised classification methods
+- `clustering/` contains implementations of semi-supervised clustering algorithms
+
 ```text
 ├── classification/
 │   ├── ApplicationClassification.py
