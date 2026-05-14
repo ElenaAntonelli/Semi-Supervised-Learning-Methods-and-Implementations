@@ -1,9 +1,9 @@
-# Thesis Project - Semi-Supervised Learning
+# Semi-Supervised Learning Thesis Project 
 
 
 ---
 
-Executive Summary 
+## Executive Summary 
 
 The thesis explores semi-supervised learning approaches in scenarios where labeled data are limited while unlabeled data are widely available. In recent years, the increasing availability of large-scale datasets has highlighted the limitations of traditional supervised learning methods, since obtaining reliable labels is often expensive, time-consuming, and impractical in real-world applications. Semi-supervised learning addresses this issue by integrating both labeled and unlabeled data during the learning process.
 
@@ -15,32 +15,9 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 
 ---
 
-🧩 Gameplay
+## Objectives
 
-In Obscura il giocatore esplora un ospedale psichiatrico abbandonato in prima persona, cercando di sopravvivere mentre ricostruisce un passato oscuro e frammentato.
 
-Le principali meccaniche di gioco includono:
-
-- Esplorazione immersiva 🕯️
-  Ambienti labirintici e in continua trasformazione, con corridoi che cambiano, porte che si aprono solo in determinate condizioni e stanze che rivelano dettagli inquietanti.
-
-- Enigmi psicologici 🧩
-  Puzzle ambientali, codici nascosti nei documenti clinici e indovinelli che richiedono osservazione e logica per essere risolti.
-
-- Gestione delle risorse 🔦
-  Il giocatore deve utilizzare con cautela torce e batterie, trovando oggetti che svelano indizi ma che spesso richiedono scelte su come e quando impiegarli.
-
-- Minacce dinamiche 👁️‍🗨️
-  Presenze oscure che si muovono in modo imprevedibile e reagiscono al rumore e alle azioni del giocatore, creando tensione costante e costringendo a bilanciare stealth e fuga.
-
-- Narrazione ambientale 📜
-  Documenti, graffiti e oggetti raccontano storie frammentarie, rivelando progressivamente dettagli sul passato del luogo e sul ruolo del protagonista.
-
-- Flashback inquietanti 🩸
-  In momenti chiave il protagonista rivive frammenti disturbanti del suo passato. Queste sequenze alterano l’ambiente e la percezione del giocatore, offrendo nuove informazioni ma aumentando il senso di disagio e confusione.
-
-- Interazione con il microfono 🎤
-  Il gioco potrà utilizzare il microfono del giocatore per captare suoni reali. Ogni rumore emesso (parlare, respirare forte, piccoli colpi) potrà attirare l’attenzione delle creature, aumentando la tensione e obbligando il giocatore a restare davvero in silenzio nella vita reale.
 
 ---
 
