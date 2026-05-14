@@ -17,40 +17,41 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 
 ## Objectives
 
+---
+
+## Methods
+
+### Semi-Supervised Classification
+- Support Vector Machines (S3VM)
+- Laplacian Support Vector Machines (LapSVM)
+- Laplacian Twin Support Vector Machines (Lap-TSVM)
+
+### Semi-Supervised Clustering 
+- Metric Pairwise Constrained K-means (MPCK-Means)
+- Semi-Supervised Spectral Clustering (Spectral SSC)
+
+---
+
+## Results
 
 
 ---
 
-🛠️ Tecnologie Utilizzate
+## 🛠️ Technologies Used
 
-Unreal Engine 5.0
+- item Python
+- item Scikit-learn
+- NumPy
+- Optuna
+- Matplotlib
+
+---
+
+## Repository Structure
+
 
 ---
 
-📌 Stato del Progetto
-
-✅ Funzionalità Completate
-
-- Sistema delle porte → apertura e chiusura interattiva.
-- Torcia → accensione/spegnimento, gestione della luce.
-- Sistema dei passi → suoni diversi su erba, legno e acciaio.
-- Nemico base → pattugliamento, inseguimento e attacco.
-- Gestione luci → accensione, spegnimento, rottura e sfarfallio dinamico.
-- Sistema di salute → danni e morte del personaggio.
-- Stamina + Sprint → corsa limitata con barra stamina.
-- Sistema batterie → gestione della durata e ricarica della torcia.
-- Sistema battito cardiaco → suono che aumenta d’intensità e ritmo in base alla distanza del nemico.
-- Sistema documenti → raccolta e lettura di file/testimonianze per svelare la storia.
-  
-🔄 In Sviluppo
-
- - Orologio con GUI → interfaccia per mostrare vita, stamina e livello di paura.
- - IA del mostro avanzata → rilevamento solo con luce accesa.
- - Sistema paura → meccanica psicologica che influenza la percezione del giocatore.
-
-
----
- 
 🔮 Visione futura
 
 In futuro, Obscura potrà espandersi con nuove funzionalità e contenuti per arricchire l’esperienza di gioco:
