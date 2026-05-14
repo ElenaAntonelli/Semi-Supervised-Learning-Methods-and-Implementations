@@ -3,7 +3,7 @@
 
 ---
 
-## Executive Summary 
+## 📘 Executive Summary 
 
 The thesis explores semi-supervised learning approaches in scenarios where labeled data are limited while unlabeled data are widely available. In recent years, the increasing availability of large-scale datasets has highlighted the limitations of traditional supervised learning methods, since obtaining reliable labels is often expensive, time-consuming, and impractical in real-world applications. Semi-supervised learning addresses this issue by integrating both labeled and unlabeled data during the learning process.
 
@@ -15,11 +15,11 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 
 ---
 
-## Objectives
+## 🎯 Objectives
 
 ---
 
-## Methods
+## 🔬 Methods
 
 ### Semi-Supervised Classification
 - Support Vector Machines (S3VM)
@@ -32,49 +32,33 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 
 ---
 
-## Results
+## ⚙️ Experimental Setup
+
+---
+
+## 🔍 Main Findings
 
 
 ---
 
 ## 🛠️ Technologies Used
 
-- item Python
-- item Scikit-learn
+- Python
+- Scikit-learn
 - NumPy
 - Optuna
 - Matplotlib
 
 ---
 
-## Repository Structure
+## 📂 Repository Structure
 
 
 ---
 
-🔮 Visione futura
-
-In futuro, Obscura potrà espandersi con nuove funzionalità e contenuti per arricchire l’esperienza di gioco:
-
-- Flashback interattivi → sequenze narrative che immergono il giocatore nei ricordi inquietanti del protagonista.
-- Puzzle complessi → enigmi ambientali più articolati, collegati a documenti e indizi nascosti.
-- Finali multipli → scelte del giocatore che influenzano la trama e il destino del protagonista.
-- Nuove aree dell’ospedale → reparti inesplorati, sotterranei e ambienti distorti che ampliano la mappa.
-- Nemici aggiuntivi → creature con comportamenti unici che rappresentano diversi aspetti della follia e del senso di colpa.
-- Sistema audio avanzato → utilizzo dinamico dei suoni per creare tensione e orientare il giocatore.
-- Ottimizzazione grafica e performance → miglioramenti visivi e tecnici per rendere l’esperienza più fluida e immersiva.
-
----
-
-🖼️ Media
+## 🚀 Future Improvements
 
 
----
 
-Video Demo
-- link: https://www.youtube.com/watch?v=pcYNW_uPQRI
 
----
 
-Download
-- link:
