@@ -76,6 +76,7 @@ The experimental analysis was performed on 15 UCI datasets using different semi-
 
 ## 📂 Repository Structure
 
+```text
 ├── classification/
 │   ├── ApplicationClassification.py
 │   ├── S3VM_method.py
@@ -86,7 +87,7 @@ The experimental analysis was performed on 15 UCI datasets using different semi-
     ├── ApplicationClustering.py
     ├── MPCK_Means_method.py
     └── SpectralSSC_method.py
-
+```
 ---
 
 ## 🚀 Future Improvements
