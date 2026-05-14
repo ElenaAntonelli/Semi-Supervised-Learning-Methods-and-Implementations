@@ -5,13 +5,11 @@
 
 ## 📘 Executive Summary 
 
-The thesis explores semi-supervised learning approaches in scenarios where labeled data are limited while unlabeled data are widely available. In recent years, the increasing availability of large-scale datasets has highlighted the limitations of traditional supervised learning methods, since obtaining reliable labels is often expensive, time-consuming, and impractical in real-world applications. Semi-supervised learning addresses this issue by integrating both labeled and unlabeled data during the learning process.
+The thesis explores semi-supervised learning approaches in scenarios where labeled data are limited while unlabeled data are widely available. In recent years, the growing availability of large-scale datasets has highlighted the limitations of traditional supervised learning methods, since obtaining reliable labels is often expensive, time-consuming, and impractical in many real-world applications. Semi-supervised learning addresses this issue by integrating both labeled and unlabeled data during the learning process.
 
-The main focus of the thesis is the analysis of semi-supervised classification methods, investigating how unlabeled samples can improve class assignment performance when only a small amount of labeled data is available. In addition, semi-supervised clustering techniques were studied to evaluate how partial supervision can provide preliminary information about cluster structure and data organization.
+The project mainly focuses on semi-supervised classification methods, investigating how unlabeled samples can support class assignment when only a small amount of labeled data is available. In addition, semi-supervised clustering techniques were analyzed to study how partial supervision can provide useful information about data organization and cluster structure.
 
-Several algorithms, including S3VM, Laplacian-based methods, MPCK-Means, and Semi-Supervised Spectral Clustering, were implemented and evaluated through experiments on multiple UCI datasets. Experimental results on classification tasks showed that increasing the amount of labeled data generally improves accuracy and stability, although performance remains strongly influenced by dataset characteristics such as class separability, overlap, and dimensionality. The analysis also highlighted that S3VM methods are often competitive with very limited supervision, while Laplacian-based approaches tend to achieve better performance as the number of labeled samples increases.
-
-For semi-supervised clustering, the introduction of pairwise constraints generally improves clustering quality, with the largest performance gains often achieved using a relatively small number of constraints before reaching saturation effects. The experiments further showed that the stability and effectiveness of clustering methods are closely related to the intrinsic structure of the data and to the adopted constraint configuration.
+Several algorithms were implemented and evaluated through experimental analysis on multiple UCI datasets. The results highlighted the impact of supervision, dataset structure, and constraint configuration on the effectiveness and stability of semi-supervised learning methods for both classification and clustering tasks.
 
 ---
 
