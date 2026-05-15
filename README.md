@@ -93,6 +93,7 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 - Python
 - Scikit-learn
 - NumPy
+- Pandas
 - Optuna
 - Matplotlib
 
