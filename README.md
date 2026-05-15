@@ -127,6 +127,10 @@ The repository is organized into three main sections:
 
 ## 🚀 Future Improvements
 
+- Compare semi-supervised methods with traditional supervised approaches, including fully supervised scenarios
+- Investigate more advanced pairwise constraint generation strategies for semi-supervised clustering
+- Extend the experimental analysis to larger and more complex datasets
+- Explore the scalability and computational efficiency of semi-supervised learning methods in high-dimensional scenarios
 
 
 
