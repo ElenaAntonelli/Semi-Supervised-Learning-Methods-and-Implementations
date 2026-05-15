@@ -61,6 +61,13 @@ The experimental analysis was performed on 15 UCI datasets using different semi-
 
 ## 🔍 Main Findings
 
+Experimental results on classification tasks showed that increasing the amount of labeled data generally improves accuracy and stability, although performance remains strongly influenced by dataset characteristics such as class separability, overlap, and dimensionality. The analysis also highlighted that S3VM methods are often competitive with very limited supervision, while Laplacian-based approaches tend to achieve better performance as the number of labeled samples increases.
+
+For semi-supervised clustering, the introduction of pairwise constraints generally improves clustering quality, with the largest performance gains often achieved using a relatively small number of constraints before reaching saturation effects. The experiments further showed that the stability and effectiveness of clustering methods are closely related to the intrinsic structure of the data and to the adopted constraint configuration.
+
+### Classification Examples 
+
+
 
 ---
 
