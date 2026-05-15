@@ -67,7 +67,17 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 
 ### Classification Examples 
 
+<p align="center">
+  <img src="images/ionosphere.png" width="45%"/>
+  <img src="images/heart_disease.png" width="45%"/>
+</p>
 
+### Clustering Examples
+
+<p align="center">
+  <img src="images/iris.png" width="45%"/>
+  <img src="images/ecoli.png" width="45%"/>
+</p>
 
 ---
 
@@ -83,9 +93,10 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 
 ## 📂 Repository Structure
 
-The repository is organized into two main sections:
+The repository is organized into three main sections:
 - `classification/` contains implementations of semi-supervised classification methods
 - `clustering/` contains implementations of semi-supervised clustering algorithms
+- `images/` contains selected figures used to summarize the experimental results
 
 ```text
 ├── classification/
@@ -94,10 +105,16 @@ The repository is organized into two main sections:
 │   ├── LapSVM_method.py
 │   └── LapTwinSVM_method.py
 │
-└── clustering/
-    ├── ApplicationClustering.py
-    ├── MPCK_Means_method.py
-    └── SpectralSSC_method.py
+├── clustering/
+│   ├── ApplicationClustering.py
+│   ├── MPCK_Means_method.py
+│   └── SpectralSSC_method.py
+│
+└── images/
+    ├── ecoli.png
+    ├── heart_disease.png
+    ├── ionosphere.png
+    └── iris.png
 ```
 ---
 
