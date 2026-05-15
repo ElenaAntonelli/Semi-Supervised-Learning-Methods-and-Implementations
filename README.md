@@ -68,8 +68,9 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 ### Classification Examples 
 
 <p align="center">
-  <img src="images/ionosphere.png" width="35%"/>
-  <img src="images/heart_disease.png" width="35%"/>
+  <img src="images/ionosphere.png" width="30%"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="images/heart_disease.png" width="30%"/>
 </p>
 
 - **Ionosphere:** classification accuracy generally increases as the amount of labeled data grows, highlighting the positive impact of supervision.
@@ -78,8 +79,8 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 ### Clustering Examples
 
 <p align="center">
-  <img src="images/iris.png" width="45%"/>
-  <img src="images/ecoli.png" width="45%"/>
+  <img src="images/iris.png" width="40%"/>
+  <img src="images/ecoli.png" width="40%"/>
 </p>
 
 - **Iris:** clustering quality improves rapidly with the introduction of pairwise constraints, before showing a slight decline at higher constraint levels.
