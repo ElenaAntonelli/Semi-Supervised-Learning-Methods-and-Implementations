@@ -5,7 +5,7 @@
 
 ## 📘 Executive Summary 
 
-The thesis explores semi-supervised learning approaches in scenarios where labeled data are limited while unlabeled data are widely available. In recent years, the growing availability of large-scale datasets has highlighted the limitations of traditional supervised learning methods, since obtaining reliable labels is often expensive, time-consuming, and impractical in many real-world applications. Semi-supervised learning addresses this issue by integrating both labeled and unlabeled data during the learning process.
+This thesis explores semi-supervised learning approaches in scenarios where labeled data are limited while unlabeled data are widely available. In recent years, the growing availability of large-scale datasets has highlighted the limitations of traditional supervised learning methods, since obtaining reliable labels is often expensive, time-consuming, and impractical in many real-world applications. Semi-supervised learning addresses this issue by integrating both labeled and unlabeled data during the learning process.
 
 The project mainly focuses on semi-supervised classification methods, investigating how unlabeled samples can support class assignment when only a small amount of labeled data is available. In addition, semi-supervised clustering techniques were analyzed to study how partial supervision can provide useful information about data organization and cluster structure.
 
