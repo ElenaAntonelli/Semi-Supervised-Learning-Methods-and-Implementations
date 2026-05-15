@@ -68,9 +68,12 @@ For semi-supervised clustering, the introduction of pairwise constraints general
 ### Classification Examples 
 
 <p align="center">
-  <img src="images/ionosphere.png" width="45%"/>
-  <img src="images/heart_disease.png" width="45%"/>
+  <img src="images/ionosphere.png" width="35%"/>
+  <img src="images/heart_disease.png" width="35%"/>
 </p>
+
+- **Ionosphere:** classification accuracy generally increases as the amount of labeled data grows, highlighting the positive impact of supervision.
+- **Heart Disease:** S3VM remains competitive even with very limited supervision, while Laplacian-based methods improve as more labeled samples become available.
 
 ### Clustering Examples
 
@@ -79,6 +82,9 @@ For semi-supervised clustering, the introduction of pairwise constraints general
   <img src="images/ecoli.png" width="45%"/>
 </p>
 
+- **Iris:** clustering quality improves rapidly with the introduction of pairwise constraints, before showing a slight decline at higher constraint levels.
+- **E.coli:** clustering performance exhibits a non-monotonic trend, with MPCK-Means showing higher variability at larger numbers of constraints.
+  
 ---
 
 ## 🛠️ Technologies Used
